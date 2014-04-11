@@ -118,7 +118,7 @@ void add_notes(Song & input_song, int32_t ** note_order, int32_t * positions) {
 		uint32_t time = positions[pos_idx];
 
 		if(note == pos_idx) {
-		    input_song->note_position.push_back(std::make_tuple(note_row, note_col, time));
+		    input_song.note_position.push_back(std::make_tuple(note_row, note_col, time));
 		}
 	    }
 	}
@@ -126,9 +126,9 @@ void add_notes(Song & input_song, int32_t ** note_order, int32_t * positions) {
 }
 
 int32_t unicode_to_order(std::string uni_char) {
-    if(std::strcmp(uni_char, "\u2460")) {
+    if(uni_char == "\u2460") {
 	return 0;
-    } else if(std::strcmp(uni_char, "\u2461")) {
+    } else if(uni_char == "\u2461") {
 	return 1;
     } else if(uni_char == u8"\u2462") {
 	return 2;
