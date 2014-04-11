@@ -40,10 +40,18 @@ void parse_chart(std::string & input_file, Song & input_song) {
 		note_start = true;
 	    } else if(boost::starts_with(line, "t =")) {
 		input_song.bpm = add_header_var(line);
+		if(input_song.bpm != 0 && input_song.beats != 0) {
+		    input_song.note_offset = ((60000 / input_song.bpm) /
+					      input_song.beats);
+		}
 	    } else if(boost::starts_with(line, "o =")) {
 		offset_timer = add_header_var(line);
 	    } else if(boost::starts_with(line, "b =")) {
 		input_song.beats = add_header_var(line);
+		if(input_song.bpm != 0 && input_song.beats != 0) {
+		    input_song.note_offset = ((60000 / input_song.bpm) /
+					      input_song.beats);
+		}
 	    } else if(boost::starts_with(line, "n =")) {
 		input_song.note_value = add_header_var(line);
 	    }
@@ -59,7 +67,6 @@ void parse_chart(std::string & input_file, Song & input_song) {
 		if(cur_char == 124) {
 		    uint32_t note_value = utf8::distance(note_seq, line_end) - 1;
 		    note_timing = true;
-		    std::cout << "Started timing" << "\n";
 
 		    if(note_value == 0) {
 			continue;
@@ -81,7 +88,6 @@ void parse_chart(std::string & input_file, Song & input_song) {
 		    int32_t order_num = unicode_to_order(cur_char);
 
 		    if(order_num > 0 && order_num <= 15) {
-			std::cout << order_num << " " << note_row << ":" << row_position << "\n";
 			note_order[note_row][row_position] = order_num;
 			row_position++;
 		    } else if(cur_char == 9633) {
@@ -91,7 +97,7 @@ void parse_chart(std::string & input_file, Song & input_song) {
 		    int32_t order_num = unicode_to_order(cur_char);
 
 		    if(order_num > 0 && order_num <= 15) {
-			positions[order_num] = offset_timer;
+			positions[order_num - 1] = offset_timer;
 		    }
 
 		    offset_timer += offset_increment;
@@ -125,9 +131,7 @@ void add_notes(Song & input_song, int32_t note_order[][4], int32_t * positions) 
 		uint32_t time = positions[pos_idx];
 
 		if(note - 1 == pos_idx) {
-		    //std::cout << note_row << " " << note_col << " " << time << "\n";
 		    input_song.note_position.push_back(std::make_tuple(note_row, note_col, time));
-		    //std::cout << std::get<2>(input_song.note_position.back()) << "\n";
 		}
 	    }
 	}

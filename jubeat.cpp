@@ -14,6 +14,6 @@ int main() {
 
     std::vector<std::tuple<int32_t, int32_t, uint32_t> >::iterator notes;
     for(notes = example_song.note_position.begin(); notes != example_song.note_position.end(); ++notes)
-	std::cout << std::get<0>(*notes) << std::get<1>(*notes) << std::get<2>(*notes) << "\n";
+	std::cout << std::get<0>(*notes) << " " << std::get<1>(*notes) << " " << std::get<2>(*notes) << "\n";
     return 0;
 }
