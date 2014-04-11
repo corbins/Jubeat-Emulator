@@ -8,7 +8,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "parser.h"
-#include "libs/utf8.h"
+#include "lib/utf8.h"
 #include "song.h"
 
 /*

@@ -5,10 +5,10 @@
 #include <boost/lexical_cast.hpp>
 
 #include "parser.h"
-#include "libs/utf8.h"
+#include "lib/utf8.h"
 #include "song.h"
 
-void parse_chart(string & input_file, Song & input_song) {
+void parse_chart(std::string & input_file, Song & input_song) {
     int32_t note_order[4][4] = {};
     int32_t positions[16] = {};
     uint32_t offset_increment = 0;
@@ -29,13 +29,11 @@ void parse_chart(string & input_file, Song & input_song) {
 	//Only work with valid UTF-8 encoded characters
 	std::string::iterator line_end = utf8::find_invalid(line.begin(),
 							    line.end());
-	std::string::iterator note_seq;
+	std::string note_seq::iterator;
 	uint32_t line_length = utf8::distance(line.begin(), line_end);
 	uint32_t row_position = 0;
 
 	if(!note_start) {
-	    uint32_t location = 0;
-
 	    if(line == "#NOTE_START") {
 		note_start = true;
 	    } else if(boost::starts_with(line, "t =")) {
@@ -56,13 +54,13 @@ void parse_chart(string & input_file, Song & input_song) {
 	    for(note_seq = line.begin(); note_seq != line_end;
 		utf8::next(note_seq), ++row_position) {
 
-		if(note_seq != u8'\u25A1' && row_position < 4) {
+		if(std::strcmp(note_seq, "\u25A1") != 0 && row_position < 4) {
 		    int32_t order_num = unicode_to_order(note_seq);
 
 		    if(order_num > 0 && order_num <= 16) {
 			note_order[note_row][row_position] = order_num;
 		    }
-		} else if(note_seq == '|') {
+		} else if(std::strcmp(note_seq, "|")) {
 		    uint32_t note_value = utf8::distance(note_seq, line_end) - 1;
 
 		    if(note_value == 0) {
@@ -109,8 +107,7 @@ void parse_chart(string & input_file, Song & input_song) {
 	    }
 	}
     }
-
-    input_file.close()
+    step_chart.close()
 }
 
 void add_notes(Song & input_song, int32_t ** note_order, int32_t * positions) {
@@ -129,9 +126,9 @@ void add_notes(Song & input_song, int32_t ** note_order, int32_t * positions) {
 }
 
 int32_t unicode_to_order(std::string uni_char) {
-    if(uni_char == u8"\u2460") {
+    if(std::strcmp(uni_char, "\u2460")) {
 	return 0;
-    } else if(uni_char == u8"\u2461") {
+    } else if(std::strcmp(uni_char, "\u2461")) {
 	return 1;
     } else if(uni_char == u8"\u2462") {
 	return 2;
@@ -161,13 +158,16 @@ int32_t unicode_to_order(std::string uni_char) {
 	return 14;
     } else if(uni_char == u8"\u2475") {
 	return 15;
-    } else {
-	return -1;
     }
+
+    return -1;
 }
 
 int32_t add_header_var(std::string line) {
-    location = line.find('=') + 1;
-
-    return std::stoi(line.substr(location));
+    uint32_t location = line.find('=') + 1;
+    try {
+	return std::stoi(line.substr(location));
+    } catch(...) {
+	return 0;
+    }
 }
