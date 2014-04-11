@@ -15,7 +15,7 @@
  * The parsing routine.  Takes in an input of jubeat memo format (in a .txt)
  * params: The title of the file, the song object to parse into.
  */
-void parse_chart(std::string & input_file);
+void parse_chart(std::string & input_file, Song & input_song);
 
 /*
  * Adds notes into the songs buffer for timing.

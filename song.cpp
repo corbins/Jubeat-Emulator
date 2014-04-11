@@ -9,6 +9,7 @@ Song::Song() {
     great = 0;
     good = 0;
     bad = 0;
+    combo = 0;
 
     bpm = 0;
     beats = 4;
