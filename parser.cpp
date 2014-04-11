@@ -41,19 +41,24 @@ void parse_chart(std::string & input_file, Song & input_song) {
 	    } else if(boost::starts_with(line, "t =")) {
 		input_song.bpm = add_header_var(line);
 		if(input_song.bpm != 0 && input_song.beats != 0) {
-		    input_song.note_offset = ((60000 / input_song.bpm) /
-					      input_song.beats);
+		    input_song.note_offset = ((60000 / input_song.bpm) *
+					      (input_song.note_value / 4));
 		}
 	    } else if(boost::starts_with(line, "o =")) {
 		offset_timer = add_header_var(line);
 	    } else if(boost::starts_with(line, "b =")) {
 		input_song.beats = add_header_var(line);
 		if(input_song.bpm != 0 && input_song.beats != 0) {
-		    input_song.note_offset = ((60000 / input_song.bpm) /
-					      input_song.beats);
+		    input_song.note_offset = ((60000 / input_song.bpm) *
+					      (input_song.note_value / 4));
 		}
 	    } else if(boost::starts_with(line, "n =")) {
 		input_song.note_value = add_header_var(line);
+		if(input_song.bpm != 0 && input_song.beats != 0) {
+		    input_song.note_offset = ((60000 / input_song.bpm) *
+					      (input_song.note_value / 4));
+		}
+
 	    }
 	} else {
 	    //At minimum, requires 4 notes.
@@ -72,18 +77,7 @@ void parse_chart(std::string & input_file, Song & input_song) {
 			continue;
 		    }
 
-		    if(note_value > input_song.note_value) {
-			offset_increment = input_song.note_offset /
-			    (note_value * input_song.note_value);
-
-		    } else if(note_value == input_song.note_value) {
-			offset_increment = input_song.note_offset;
-
-		    } else if(note_value < input_song.note_value) {
-			offset_increment = input_song.note_offset *
-			    (input_song.note_value / note_value);
-
-		    }
+		    offset_increment = input_song.note_offset / note_value;
 		} else if(note_timing == false) {
 		    int32_t order_num = unicode_to_order(cur_char);
 
@@ -104,7 +98,7 @@ void parse_chart(std::string & input_file, Song & input_song) {
 		}
 	    }
 
-	    note_row = (note_row + 1) % 4;
+	    note_row = (note_row + 1) % input_song.beats;
 
 	    if(note_row == 0) {
 		add_notes(input_song, note_order, positions);
