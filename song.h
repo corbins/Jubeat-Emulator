@@ -43,4 +43,6 @@ class Song {
 
     //The buffer containing the timing for all the notes.
     std::vector<std::tuple<int32_t, int32_t, uint32_t> > note_position;
-}
+};
+
+#endif

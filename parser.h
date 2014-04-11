@@ -21,7 +21,7 @@ void parse_chart(std::string & input_file);
  * Adds notes into the songs buffer for timing.
  * params: The song object, Which order the notes are hit, What timing to hit at
  */
-void add_notes(Song & input_song, int32_t ** note_order, int32_t * positions);
+void add_notes(Song & input_song, int32_t note_order[][4], int32_t * positions);
 
 /*
  * Converts unicode characters to their correct order values.
@@ -29,7 +29,7 @@ void add_notes(Song & input_song, int32_t ** note_order, int32_t * positions);
  * params: The unicode character to convert
  * returns: The correct order representation.
  */
-int32_t unicode_to_order(std::string uni_char);
+int32_t unicode_to_order(uint32_t uni_char);
 
 /*
  * Converts header variables into the representative int.
