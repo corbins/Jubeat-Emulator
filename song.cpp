@@ -1,5 +1,8 @@
+#include <tuple>
 #include <vector>
 #include <stdint.h>
+
+#include "song.h"
 
 Song::Song() {
     perfect = 0;

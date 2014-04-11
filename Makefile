@@ -9,7 +9,7 @@ jubeat.o: jubeat.cpp
 	$(COMPILER) $(COMPILER_FLAGS) jubeat.cpp
 
 song.o: song.cpp song.h
-	$(COMPILER) $(COMPILER_FLAGS) jubeat.cpp
+	$(COMPILER) $(COMPILER_FLAGS) song.cpp
 
 parser.o: parser.cpp parser.h song.h lib/utf8.h
 	$(COMPILER) $(COMPILER_FLAGS) parser.cpp
