@@ -33,32 +33,27 @@ void parse_chart(std::string & input_file, Song & input_song) {
 	uint32_t line_length = utf8::distance(line.begin(), line_end);
 	uint32_t row_position = 0;
 	uint32_t cur_char = 0;
-	bool note_timing = false;
 
-	if(!note_start) {
-	    if(line == "#NOTE_START") {
-		note_start = true;
-	    } else if(boost::starts_with(line, "t =")) {
-		input_song.bpm = add_header_var(line);
-		if(input_song.bpm != 0 && input_song.beats != 0) {
-		    input_song.note_offset = ((60000 / input_song.bpm) *
-					      (input_song.note_value / 4));
-		}
-	    } else if(boost::starts_with(line, "o =")) {
-		offset_timer = add_header_var(line);
-	    } else if(boost::starts_with(line, "b =")) {
-		input_song.beats = add_header_var(line);
-		if(input_song.bpm != 0 && input_song.beats != 0) {
-		    input_song.note_offset = ((60000 / input_song.bpm) *
-					      (input_song.note_value / 4));
-		}
-	    } else if(boost::starts_with(line, "n =")) {
-		input_song.note_value = add_header_var(line);
-		if(input_song.bpm != 0 && input_song.beats != 0) {
-		    input_song.note_offset = ((60000 / input_song.bpm) *
-					      (input_song.note_value / 4));
-		}
-
+	//Begin by checking the headers
+	if(boost::starts_with(line, "t =")) {
+	    input_song.bpm = add_header_var(line);
+	    if(input_song.bpm != 0 && input_song.beats != 0) {
+		input_song.note_offset = ((60000 / input_song.bpm) *
+					  (input_song.note_value / 4));
+	    }
+	} else if(boost::starts_with(line, "o =")) {
+	    offset_timer = add_header_var(line);
+	} else if(boost::starts_with(line, "b =")) {
+	    input_song.beats = add_header_var(line);
+	    if(input_song.bpm != 0 && input_song.beats != 0) {
+		input_song.note_offset = ((60000 / input_song.bpm) *
+					  (input_song.note_value / 4));
+	    }
+	} else if(boost::starts_with(line, "n =")) {
+	    input_song.note_value = add_header_var(line);
+	    if(input_song.bpm != 0 && input_song.beats != 0) {
+		input_song.note_offset = ((60000 / input_song.bpm) *
+					  (input_song.note_value / 4));
 	    }
 	} else {
 	    //At minimum, requires 4 notes.
