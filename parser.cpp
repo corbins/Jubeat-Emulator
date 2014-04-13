@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <fstream>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include "parser.h"
 #include "lib/utf8.h"
@@ -15,8 +14,6 @@ void parse_chart(std::string & input_file, Song & input_song) {
     uint32_t offset_increment = 0;
     uint32_t offset_timer = 0;
     int32_t note_row = 0;
-
-    bool note_start = false;
 
     std::ifstream step_chart(input_file+".txt");
     std::string line;
@@ -33,6 +30,7 @@ void parse_chart(std::string & input_file, Song & input_song) {
 	uint32_t line_length = utf8::distance(line.begin(), line_end);
 	uint32_t row_position = 0;
 	uint32_t cur_char = 0;
+	bool note_timing = false;
 
 	//Begin by checking the metadata
 	if(boost::starts_with(line, "t =")) {
@@ -65,7 +63,7 @@ void parse_chart(std::string & input_file, Song & input_song) {
 		cur_char = utf8::next(note_seq,line_end)) {
 
 		//Checks for vertical bar, signifying parsing of timing.
-		if(cur_char == 124) {
+		if(cur_char == 124 && note_timing == false) {
 		    uint32_t note_value = utf8::distance(note_seq, line_end)-1;
 		    note_timing = true;
 
@@ -84,6 +82,9 @@ void parse_chart(std::string & input_file, Song & input_song) {
 			row_position++;
 		    } else if(cur_char == 9633) {
 			row_position++;
+		    } else {
+			std::cout << "Corrupted file... bailing out.";
+			return;
 		    }
 		  //In timing, assume either a note or a rest.
 		} else {
@@ -91,6 +92,9 @@ void parse_chart(std::string & input_file, Song & input_song) {
 
 		    if(order_num > 0 && order_num <= 15) {
 			positions[order_num - 1] = offset_timer;
+		    } else if(cur_char != 45) {
+			std::cout << "Corrupted file... bailing out.";
+			return;
 		    }
 
 		    offset_timer += offset_increment;
