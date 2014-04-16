@@ -9,12 +9,21 @@
 #include "song.h"
 
 void parse_chart(std::string & input_file, Song & input_song) {
+    //Unicode constants
+    static const int32_t USPACE  = 32;
+    static const int32_t UNULL   = 0;
+    static const int32_t UDASH   = 65293;
+    static const int32_t USQUARE = 9633;
+    static const int32_5 UBAR    = 124;
+
+    //Models to hold note and timing information
     int32_t note_order[4][4] = {{0}};
     int32_t positions[16] = {0};
     uint32_t offset_increment = 0;
     uint32_t offset_timer = 0;
     int32_t note_row = 0;
 
+    //Data to parse
     std::ifstream step_chart(input_file+".txt");
     std::string line;
 
@@ -63,7 +72,7 @@ void parse_chart(std::string & input_file, Song & input_song) {
 		cur_char = utf8::next(note_seq,line_end)) {
 
 		//Checks for vertical bar, signifying parsing of timing.
-		if(cur_char == 124 && note_timing == false) {
+		if(cur_char == UBAR && note_timing == false) {
 		    uint32_t note_value = utf8::distance(note_seq, line_end)-1;
 		    note_timing = true;
 
@@ -80,9 +89,9 @@ void parse_chart(std::string & input_file, Song & input_song) {
 		    if(order_num > 0 && order_num <= 15) {
 			note_order[note_row][row_position] = order_num;
 			row_position++;
-		    } else if(cur_char == 9633) {
+		    } else if(cur_char == USQUARE) {
 			row_position++;
-		    } else {
+		    } else if(cur_char != USPACE && cur_char != UNULL){
 			std::cout << "Corrupted file... bailing out.";
 			return;
 		    }
@@ -92,7 +101,8 @@ void parse_chart(std::string & input_file, Song & input_song) {
 
 		    if(order_num > 0 && order_num <= 15) {
 			positions[order_num - 1] = offset_timer;
-		    } else if(cur_char != 45) {
+		    } else if(cur_char != UDASH &&
+			      cur_char != USPACE && cur_char != UNULL) {
 			std::cout << "Corrupted file... bailing out.";
 			return;
 		    }
@@ -141,41 +151,10 @@ void add_notes(Song & input_song,
 }
 
 int32_t unicode_to_order(uint32_t uni_char) {
-    if(uni_char == 9312) {
-	return 1;
-    } else if(uni_char == 9313) {
-	return 2;
-    } else if(uni_char == 9314) {
-	return 3;
-    } else if(uni_char == 9315) {
-	return 4;
-    } else if(uni_char == 9316) {
-	return 5;
-    } else if(uni_char == 9317) {
-	return 6;
-    } else if(uni_char == 9318) {
-	return 7;
-    } else if(uni_char == 9319) {
-	return 8;
-    } else if(uni_char == 9320) {
-	return 9;
-    } else if(uni_char == 9321) {
-	return 10;
-    } else if(uni_char == 9322) {
-	return 11;
-    } else if(uni_char == 9323) {
-	return 12;
-    } else if(uni_char == 9324) {
-	return 13;
-    } else if(uni_char == 9325) {
-	return 14;
-    } else if(uni_char == 9326) {
-	return 15;
-    } else if(uni_char == 9327) {
-	return 16;
-    }
+    //Unicode value for circled 1, the rest are sequential.
+    int32_t base_circled_num = 9312;
 
-    return -1;
+    return uni_char - base_circled_num + 1;
 }
 
 int32_t add_header_var(std::string line) {
