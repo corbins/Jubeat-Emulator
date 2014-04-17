@@ -31,7 +31,9 @@ void parse_chart(std::string & input_file, Song & input_song) {
     int32_t note_row = 0;
 
     //Data to parse
-    ifstream step_chart(input_file+".txt");
+    string song_file = string("data/") + input_file + string("/") +
+	input_file + string(".txt");
+    ifstream step_chart(song_file);
     string line;
 
     if(!step_chart.is_open()) {

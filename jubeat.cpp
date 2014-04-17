@@ -17,6 +17,7 @@ using std::cout;
 using std::vector;
 using std::tuple;
 using std::get;
+using std::getline;
 using std::chrono::milliseconds;
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
@@ -29,12 +30,13 @@ using std::this_thread::sleep_for;
  */
 void process_notes(vector<tuple<int32_t, int32_t, uint32_t> > & note_queue,
 		   milliseconds cur_time,
-		   vector<tuple<int32_t, int32_t, uint32_t> >::iterator & notes);
+		   vector<tuple<int32_t, int32_t, uint32_t> >::iterator & notes,
+		   string & song_title);
 
 /*
  * Begins playing the song file when the notes begin.
  */
-void start_song();
+void start_song(string & song_title);
 
 int main() {
     //Set up timing information
@@ -42,25 +44,30 @@ int main() {
     const uint32_t next_frame = 1000 / frames_per_second;
 
     //Set up parsing
-    Song example_song;
-    string example_title("example");
+    Song song;
+    string song_title;
+
+    cout << "Which song do you want to play?";
+    while (!std::getline(std::cin, song_title)) {
+	cout << "which song do you want to play?";
+    }
 
     //Parse the stepchart into the song object.
     cout << "Beginning parse routine";
-    parse_chart(example_title, example_song);
+    parse_chart(song_title, song);
 
     //Begin playing the song.
     cout << "Beginning song";
-    auto notes = example_song.note_position.begin();
+    auto notes = song.note_position.begin();
     auto start_time = high_resolution_clock::now();
 
     //Loop until there are no more notes
-    while(notes != example_song.note_position.end()) {
+    while(notes != song.note_position.end()) {
 	auto cur_time = high_resolution_clock::now();
 	auto cur_ms_time = duration_cast<milliseconds>
 	    (high_resolution_clock::now() - start_time);
 
-	process_notes(example_song.note_position, cur_ms_time, notes);
+	process_notes(song.note_position, cur_ms_time, notes, song_title);
 
 	//Calculate time until next frame, and sleep.
 	auto next_time = duration_cast<milliseconds>
@@ -75,7 +82,8 @@ int main() {
 
 void process_notes(vector<tuple<int32_t, int32_t, uint32_t> > & note_queue,
 		   milliseconds cur_time,
-		   vector<tuple<int32_t, int32_t, uint32_t> >::iterator & notes) {
+		   vector<tuple<int32_t, int32_t, uint32_t> >::iterator & notes,
+		   string & song_title) {
     //Check if notes exist, and if the front note is ready to be played.
     while(notes != note_queue.end() &&
 	  duration_cast<milliseconds>
@@ -83,7 +91,7 @@ void process_notes(vector<tuple<int32_t, int32_t, uint32_t> > & note_queue,
 
 	//If playing the first note, begin the song.
 	if(notes == note_queue.begin()) {
-	    start_song();
+	    start_song(song_title);
 	}
 
 	//Filler for now, will queue to View next week.
@@ -92,15 +100,17 @@ void process_notes(vector<tuple<int32_t, int32_t, uint32_t> > & note_queue,
     }
 }
 
-void start_song() {
-    FMOD::System *system;
-    FMOD::Sound *example_sound;
-    FMOD::Channel *channel = 0;
+void start_song(string & song_title) {
+    FMOD::System * system;
+    FMOD::Sound * sound;
+    FMOD::Channel * channel = 0;
+    string song_file = string("data/") + song_title + string("/") + song_title +
+	string(".mp3");
 
     //FMod junk to start an mp3 file.
-    FMOD::System_Create(&system);
+    FMOD::System_Create(& system);
     system->setOutput(FMOD_OUTPUTTYPE_ALSA);
     system->init(32, FMOD_INIT_NORMAL, 0);
-    system->createSound("data/example.mp3", FMOD_SOFTWARE, 0, &example_sound);
-    system->playSound(FMOD_CHANNEL_FREE, example_sound, 0, &channel);
+    system->createSound(song_file.c_str(), FMOD_SOFTWARE, 0, & sound);
+    system->playSound(FMOD_CHANNEL_FREE, sound, 0, & channel);
 }
