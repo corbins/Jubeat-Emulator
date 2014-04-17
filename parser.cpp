@@ -14,7 +14,7 @@ void parse_chart(std::string & input_file, Song & input_song) {
     static const int32_t UNULL   = 0;
     static const int32_t UDASH   = 65293;
     static const int32_t USQUARE = 9633;
-    static const int32_5 UBAR    = 124;
+    static const int32_t UBAR    = 124;
 
     //Models to hold note and timing information
     int32_t note_order[4][4] = {{0}};
