@@ -5,7 +5,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include "parser.h"
-#include "lib/utf8.h"
+#include "../lib/utf8.h"
 #include "song.h"
 
 //Set up namespacing to make code more readable

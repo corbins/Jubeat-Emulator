@@ -8,11 +8,11 @@ jubeat: song.o parser.o jubeat.o
 jubeat.o: jubeat.cpp
 	$(COMPILER) $(COMPILER_FLAGS) jubeat.cpp
 
-song.o: song.cpp song.h
-	$(COMPILER) $(COMPILER_FLAGS) -c song.cpp
+song.o: src/song.cpp src/song.h
+	$(COMPILER) $(COMPILER_FLAGS) -c src/song.cpp
 
-parser.o: parser.cpp parser.h song.h lib/utf8.h
-	$(COMPILER) $(COMPILER_FLAGS) -c parser.cpp
+parser.o: src/parser.cpp src/parser.h src/song.h lib/utf8.h
+	$(COMPILER) $(COMPILER_FLAGS) -c src/parser.cpp
 
 clean:
 	-rm -f *.o jubeat

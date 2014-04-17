@@ -8,8 +8,8 @@
 
 #include "lib/fmod/api/inc/fmod.hpp"
 #include "lib/fmod/api/inc/fmod_errors.h"
-#include "parser.h"
-#include "song.h"
+#include "src/parser.h"
+#include "src/song.h"
 
 //Set up namespacing to make code more readable.
 using std::string;
