@@ -87,7 +87,7 @@ void process_notes(vector<tuple<int32_t, int32_t, uint32_t> > & note_queue,
 	}
 
 	//Filler for now, will queue to View next week.
-	cout << get<0>(*notes) << " " << get<1>(*notes) << "\n";
+	cout << "Row: " << get<0>(*notes) << " Column " << get<1>(*notes) << " Note Offset: " << get<2>(*notes) << " Time: " << duration_cast<milliseconds> (cur_time - milliseconds(0)).count() << "\n";
 	++notes;
     }
 }
