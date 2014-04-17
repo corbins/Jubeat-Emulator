@@ -5,6 +5,8 @@
 #include <tuple>
 #include <chrono>
 #include <thread>
+#include "lib/fmod/api/inc/fmod.hpp"
+#include "lib/fmod/api/inc/fmod_errors.h"
 
 #include "parser.h"
 #include "song.h"
@@ -33,12 +35,21 @@ int main() {
 	std::cout << std::get<0>(*notes) << " " << std::get<1>(*notes) <<
 	    " " << std::get<2>(*notes) << "\n";
     }
-
     notes = example_song.note_position.begin();
+
+    FMOD::System *system;
+    FMOD::Sound *example_sound;
+    FMOD::Channel *channel = 0;
+
+    FMOD::System_Create(&system);
+    system->setOutput(FMOD_OUTPUTTYPE_ALSA);
+    system->init(32, FMOD_INIT_NORMAL, 0);
+    system->createSound("data/example.mp3", FMOD_SOFTWARE, 0, &example_sound);
 
     std::chrono::high_resolution_clock::time_point start_time =
 	std::chrono::high_resolution_clock::now();
 
+    system->playSound(FMOD_CHANNEL_FREE, example_sound, 0, &channel);
     while(notes != example_song.note_position.end()) {
 	std::chrono::high_resolution_clock::time_point cur_time =
 	    std::chrono::high_resolution_clock::now();
