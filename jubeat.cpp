@@ -28,12 +28,17 @@ using std::this_thread::sleep_for;
 /*
  * Searches the next notes to see if they are ready to be played.
  * Plays anything that is ready.
- * Params: The queue of notes, the current time, the note iterator.
+ * @param note_queue The queue of notes to search.
+ * @param cur_time The current time of the song.
+ * @param notes The note iterator for note_queue.
+ * @param song_title The title of the song.
+ * @param frames The current frame counter for the notes.
  */
 void process_notes(vector<tuple<int32_t, int32_t, uint32_t> > & note_queue,
 		   milliseconds cur_time,
 		   vector<tuple<int32_t, int32_t, uint32_t> >::iterator & notes,
-		   string & song_title);
+		   string & song_title,
+		   int32_t frames[][4]);
 
 /*
  * Begins playing the song file when the notes begin.
@@ -83,21 +88,32 @@ void renderTexture(SDL_Texture * tex, SDL_Renderer * ren, SDL_Rect dst,
 void renderTexture(SDL_Texture * tex, SDL_Renderer * ren, int32_t x, int32_t y,
 		   SDL_Rect * clip);
 
-
 /*
  * Draw any notes that are queued to be played.
- * @param row The row of the note to play.
- * @param col The column of the note to play.
  * @param notes The array of notes and their current frame.
+ * @param image The spritesheet of the marker.
+ * @param renderer Where to render the marker.
  */
-void draw_notes(int32_t row, int32_t col, int32_t * notes);
+void draw_notes(int32_t notes[][4], SDL_Texture * image,
+		SDL_Renderer * renderer);
+
+/*
+ * Renders the frame of the specified note.
+ * @param row The row of the note to render.
+ * @param col The column of the note to render.
+ * @param frame The current frame of the note.
+ * @param image The spritesheet of the marker.
+ * @param renderer Where to render the marker.
+ */
+void render_note(int32_t row, int32_t col, int32_t frame, SDL_Texture * image,
+		 SDL_Renderer * renderer);
 
 int main() {
     //Set up initialization defaults
     const int32_t frames_per_second = 60;
     const uint32_t next_frame = 1000 / frames_per_second;
-    const int32_t screen_width = 800;
-    const int32_t screen_height = 800;
+    const int32_t screen_width = 460;
+    const int32_t screen_height = 460;
 
     //Set up parsing
     Song song;
@@ -109,7 +125,7 @@ int main() {
     }
 
     //Parse the stepchart into the song object.
-    cout << "Beginning parse routine";
+    cout << "Beginning parse routine\n";
     parse_chart(song_title, song);
 
     //Begin loading GUI resources
@@ -135,24 +151,19 @@ int main() {
 	return 3;
     }
 
-    SDL_Texture * background = loadTexture("data/img/background.png", renderer);
-    SDL_Rect bg_rect;
-    bg_rect.x = 0;
-    bg_rect.y = 0;
-    bg_rect.w = 800;
-    bg_rect.h = 800;
+    //Load resources for the GUI
+    SDL_Texture * marker_image = loadTexture("data/img/marker_sheet.bmp",
+					   renderer);
+    SDL_Texture * empty_square = loadTexture("data/img/square.jpg", renderer);
 
-    if(background == nullptr) {
-	return 4;
-    }
-
-    renderTexture(background, renderer, bg_rect, (SDL_Rect *) nullptr);
-    SDL_RenderPresent(renderer);
+    int32_t note_frames[4][4] = {{0}};
 
     //Begin playing the song.
-    cout << "Beginning song";
+    cout << "Beginning song\n";
     auto notes = song.note_position.begin();
     auto start_time = high_resolution_clock::now();
+
+    start_song(song_title);
 
     //Loop until there are no more notes
     while(notes != song.note_position.end()) {
@@ -160,7 +171,22 @@ int main() {
 	auto cur_ms_time = duration_cast<milliseconds>
 	    (high_resolution_clock::now() - start_time);
 
-	process_notes(song.note_position, cur_ms_time, notes, song_title);
+	process_notes(song.note_position, cur_ms_time, notes, song_title,
+		      note_frames);
+
+	int32_t cur_row = 0;
+	int32_t cur_col = 0;
+	for(cur_row = 0; cur_row < 4; cur_row++) {
+	    for(cur_col = 0; cur_col < 4; cur_col++) {
+		int32_t x = cur_row * 115;
+		int32_t y = cur_col * 115;
+
+		renderTexture(empty_square, renderer, x, y, NULL);
+	    }
+	}
+
+	draw_notes(note_frames, marker_image, renderer);
+	SDL_RenderPresent(renderer);
 
 	//Calculate time until next frame, and sleep.
 	auto next_time = duration_cast<milliseconds>
@@ -171,7 +197,8 @@ int main() {
     }
 
     //Clean up GUI and return.
-    SDL_DestroyTexture(background);
+    SDL_DestroyTexture(empty_square);
+    SDL_DestroyTexture(marker_image);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -181,20 +208,21 @@ int main() {
 void process_notes(vector<tuple<int32_t, int32_t, uint32_t> > & note_queue,
 		   milliseconds cur_time,
 		   vector<tuple<int32_t, int32_t, uint32_t> >::iterator & notes,
-		   string & song_title) {
+		   string & song_title,
+		   int32_t frames[][4]) {
     //Check if notes exist, and if the front note is ready to be played.
     while(notes != note_queue.end() &&
 	  duration_cast<milliseconds>
-	  (cur_time - milliseconds(get<2>(*notes))).count() >= 0) {
+	  (cur_time - milliseconds(get<2>(*notes))).count() + (16 * 1000 / 60) >= 0) {
 
-	//If playing the first note, begin the song.
-	if(notes == note_queue.begin()) {
-	    start_song(song_title);
-	}
+	//Queue the note to play on the next frame.
+	int32_t row = get<0>(*notes);
+	int32_t col = get<1>(*notes);
+	frames[row][col] = 1;
 
-	//Filler for now, will queue to View next week.
-	cout << "Row: " << get<0>(*notes) << " Column " << get<1>(*notes) << " Note Offset: " << get<2>(*notes) << " Time: " << duration_cast<milliseconds> (cur_time - milliseconds(0)).count() << "\n";
 	++notes;
+
+	//cout << "Row: " << get<0>(*notes) << " Column " << get<1>(*notes) << " Note Offset: " << get<2>(*notes) << " Time: " << duration_cast<milliseconds> (cur_time - milliseconds(0)).count() << "\n";
     }
 }
 
@@ -226,9 +254,9 @@ SDL_Texture * loadTexture(const std::string & file, SDL_Renderer * ren){
 }
 
 void renderTexture(SDL_Texture * tex, SDL_Renderer * ren, SDL_Rect dst,
-	SDL_Rect * clip = nullptr)
+		   SDL_Rect * clip = nullptr)
 {
-	SDL_RenderCopy(ren, tex, clip, &dst);
+    SDL_RenderCopy(ren, tex, clip, &dst);
 }
 
 void renderTexture(SDL_Texture * tex, SDL_Renderer * ren, int32_t x, int32_t y,
@@ -245,6 +273,35 @@ void renderTexture(SDL_Texture * tex, SDL_Renderer * ren, int32_t x, int32_t y,
 		SDL_QueryTexture(tex, NULL, NULL, & dst.w, & dst.h);
 
 	renderTexture(tex, ren, dst, clip);
+}
+
+void draw_notes(int32_t notes[][4], SDL_Texture * image,
+		SDL_Renderer * renderer) {
+    int32_t cur_row = 0;
+    int32_t cur_col = 0;
+    for(cur_row = 0; cur_row < 4; cur_row++) {
+	for(cur_col = 0; cur_col < 4; cur_col++) {
+	    if(notes[cur_row][cur_col] != 0) {
+		render_note(cur_row, cur_col, notes[cur_row][cur_col], image,
+			    renderer);
+		notes[cur_row][cur_col] = (notes[cur_row][cur_col] + 1) % 25;
+	    }
+	}
+    }
+}
+
+void render_note(int32_t row, int32_t col, int32_t frame, SDL_Texture * image,
+		 SDL_Renderer * renderer) {
+    SDL_Rect clip;
+    clip.x = (frame - 1) % 5 * 100;
+    clip.y = (frame - 1) / 5 * 100;
+    clip.w = 100;
+    clip.h = 100;
+
+    int32_t x = row * 115;
+    int32_t y = col * 115;
+
+    renderTexture(image, renderer, x, y, &clip);
 }
 
 /*
