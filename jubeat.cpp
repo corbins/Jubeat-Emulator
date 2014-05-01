@@ -13,6 +13,9 @@
 #include "src/parser.h"
 #include "src/song.h"
 
+#include "lib/rtmidi/RtMidi.h"
+#include <cstdlib>
+
 //Set up namespacing to make code more readable.
 using std::string;
 using std::cout;
@@ -38,7 +41,8 @@ void process_notes(vector<tuple<int32_t, int32_t, uint32_t> > & note_queue,
 		   milliseconds cur_time,
 		   vector<tuple<int32_t, int32_t, uint32_t> >::iterator & notes,
 		   string & song_title,
-		   int32_t frames[][4]);
+		   int32_t frames[][4],
+		   uint32_t cur_notes[][4]);
 
 /*
  * Begins playing the song file when the notes begin.
@@ -108,16 +112,31 @@ void draw_notes(int32_t notes[][4], SDL_Texture * image,
 void render_note(int32_t row, int32_t col, int32_t frame, SDL_Texture * image,
 		 SDL_Renderer * renderer);
 
+/*
+ * The callback function for the MIDI notes, will perform the behavior
+ * assigned to each note.
+ * @param cur_time The current time in milliseconds of the program
+ * @param message The midi byte information received
+ * @param user_data Optional information that the callback can receive
+ */
+void process_midi(double cur_time, vector<unsigned char> * message,
+		  void * cur_notes);
+
+auto start_time = high_resolution_clock::now();
+Song song;
+
 int main() {
     //Set up initialization defaults
     const int32_t frames_per_second = 60;
     const uint32_t next_frame = 1000 / frames_per_second;
     const int32_t screen_width = 460;
     const int32_t screen_height = 460;
+    bool render_frame = true;
 
     //Set up parsing
-    Song song;
+
     string song_title;
+    uint32_t cur_notes[4][4] = {{0}};
 
     cout << "Which song do you want to play?";
     while (!std::getline(std::cin, song_title)) {
@@ -161,19 +180,39 @@ int main() {
     //Begin playing the song.
     cout << "Beginning song\n";
     auto notes = song.note_position.begin();
-    auto start_time = high_resolution_clock::now();
+
+
+    RtMidiIn *midiin = new RtMidiIn();
+    // Check available ports.
+    uint32_t nPorts = midiin->getPortCount();
+    if ( nPorts == 0 ) {
+	cout << "No ports available!\n";
+	return 0;
+    }
+    midiin->openPort( 1 );
+    // Set our callback function. This should be done immediately after
+    // opening the port to avoid having incoming messages written to the
+    // queue.
+    midiin->setCallback(&process_midi, cur_notes);
+    // Don't ignore sysex, timing, or active sensing messages.
+    midiin->ignoreTypes( false, false, false );
+
+    sleep_for(milliseconds(1000));
+
+    start_time = high_resolution_clock::now();
 
     start_song(song_title);
 
     //Loop until there are no more notes
     while(notes != song.note_position.end()) {
 	auto cur_time = high_resolution_clock::now();
-	auto cur_ms_time = duration_cast<milliseconds>
-	    (high_resolution_clock::now() - start_time);
+	auto cur_ms_time = duration_cast<milliseconds>(cur_time - start_time);
 
 	process_notes(song.note_position, cur_ms_time, notes, song_title,
-		      note_frames);
+		      note_frames, cur_notes);
 
+
+	if(render_frame) {
 	int32_t cur_row = 0;
 	int32_t cur_col = 0;
 	for(cur_row = 0; cur_row < 4; cur_row++) {
@@ -187,6 +226,7 @@ int main() {
 
 	draw_notes(note_frames, marker_image, renderer);
 	SDL_RenderPresent(renderer);
+	}
 
 	//Calculate time until next frame, and sleep.
 	auto next_time = duration_cast<milliseconds>
@@ -194,7 +234,10 @@ int main() {
 
 	sleep_for(duration_cast<milliseconds>
 		  (milliseconds(next_frame) - next_time));
+	render_frame = !render_frame;
     }
+
+    cout << song.perfect << "," << song.great << "," << song.good << "," << song.bad << "\n";
 
     //Clean up GUI and return.
     SDL_DestroyTexture(empty_square);
@@ -209,20 +252,25 @@ void process_notes(vector<tuple<int32_t, int32_t, uint32_t> > & note_queue,
 		   milliseconds cur_time,
 		   vector<tuple<int32_t, int32_t, uint32_t> >::iterator & notes,
 		   string & song_title,
-		   int32_t frames[][4]) {
+		   int32_t frames[][4],
+		   uint32_t cur_notes[][4]) {
     //Check if notes exist, and if the front note is ready to be played.
     while(notes != note_queue.end() &&
 	  duration_cast<milliseconds>
-	  (cur_time - milliseconds(get<2>(*notes))).count() + (16 * 1000 / 60) >= 0) {
+	  (cur_time - milliseconds(get<2>(*notes))).count() + 40*(1000/60) >= 0) {
 
 	//Queue the note to play on the next frame.
 	int32_t row = get<0>(*notes);
 	int32_t col = get<1>(*notes);
-	frames[row][col] = 1;
+
+	if(cur_notes[row][col] != 0) {
+	    song.miss++;
+	}
+
+	cur_notes[row][col] = get<2>(*notes);
+	frames[col][row] = 1;
 
 	++notes;
-
-	//cout << "Row: " << get<0>(*notes) << " Column " << get<1>(*notes) << " Note Offset: " << get<2>(*notes) << " Time: " << duration_cast<milliseconds> (cur_time - milliseconds(0)).count() << "\n";
     }
 }
 
@@ -270,7 +318,7 @@ void renderTexture(SDL_Texture * tex, SDL_Renderer * ren, int32_t x, int32_t y,
 		dst.h = clip->h;
 	}
 	else
-		SDL_QueryTexture(tex, NULL, NULL, & dst.w, & dst.h);
+	    SDL_QueryTexture(tex, NULL, NULL, & dst.w, & dst.h);
 
 	renderTexture(tex, ren, dst, clip);
 }
@@ -302,6 +350,49 @@ void render_note(int32_t row, int32_t col, int32_t frame, SDL_Texture * image,
     int32_t y = col * 115;
 
     renderTexture(image, renderer, x, y, &clip);
+}
+
+void process_midi(double cur_time, vector<unsigned char> * message,
+		  void * cur_notes) {
+    uint32_t num_bytes = message->size();
+
+    if(num_bytes >= 2 && (int)message->at(0) == 146){
+	int32_t note_index = (int)message->at(1) - 36;
+	int32_t row = 3 - note_index / 4;
+	int32_t col = note_index % 4;
+	uint32_t note_time = ((uint32_t (*)[4])cur_notes)[row][col];
+
+	if(note_time != 0) {
+	    auto cur_ms_time = duration_cast<milliseconds>
+		(high_resolution_clock::now() - start_time);
+
+	    uint32_t time_diff = cur_ms_time.count() > note_time ?
+		(cur_ms_time - milliseconds(note_time)).count() :
+		(milliseconds(note_time) - cur_ms_time).count();
+
+	    if(time_diff < 10*(1000/60)) {
+		song.perfect++;
+		song.combo++;
+	    } else if(time_diff < 20*(1000/60)) {
+		song.great++;
+		song.combo++;
+	    } else if(time_diff < 30*(1000/60)) {
+		song.good++;
+		song.combo = 0;
+	    } else {
+		song.bad++;
+		song.combo = 0;
+	    }
+
+	    cout << "Time: " << time_diff << "," << note_time << "," << cur_ms_time.count() << "\n";
+
+	    ((uint32_t (*)[4])cur_notes)[row][col] = 0;
+
+	    //cout << row << "," << col;
+	    cout << song.perfect << "," << song.great << "," << song.good << "," << song.bad << "\n";
+	    cout << song.combo << "\n";
+	}
+    }
 }
 
 /*

@@ -21,6 +21,7 @@ void parse_chart(std::string & input_file, Song & input_song) {
     static const int32_t UNULL   = 0;
     static const int32_t UDASH   = 65293;
     static const int32_t USQUARE = 9633;
+    static const int32_t USQUARE_ALT = 21475;
     static const int32_t UBAR    = 124;
 
     //Models to hold note and timing information
@@ -94,20 +95,20 @@ void parse_chart(std::string & input_file, Song & input_song) {
 		} else if(note_timing == false) {
 		    int32_t order_num = unicode_to_order(cur_char);
 
-		    if(order_num > 0 && order_num <= 15) {
+		    if(order_num > 0 && order_num <= 16) {
 			note_order[note_row][row_position] = order_num;
 			row_position++;
-		    } else if(cur_char == USQUARE) {
+		    } else if(cur_char == USQUARE || cur_char == USQUARE_ALT) {
 			row_position++;
 		    } else if(cur_char != USPACE && cur_char != UNULL){
-			cout << "Corrupted file... bailing out.";
+			cout << "Corrupted file... bailing out." << cur_char;
 			return;
 		    }
 		  //In timing, assume either a note or a rest.
 		} else {
 		    int32_t order_num = unicode_to_order(cur_char);
 
-		    if(order_num > 0 && order_num <= 15) {
+		    if(order_num > 0 && order_num <= 16) {
 			positions[order_num - 1] = offset_timer;
 		    } else if(cur_char != UDASH &&
 			      cur_char != USPACE && cur_char != UNULL) {
