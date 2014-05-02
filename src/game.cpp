@@ -13,8 +13,8 @@
 Game::Game() {
     end = false;
     render_frame = true;
-    screen_width = 460;
-    screen_height = 460;
+    screen_width = 640;
+    screen_height = 480;
     init_engine();
 }
 

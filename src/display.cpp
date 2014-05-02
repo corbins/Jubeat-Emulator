@@ -33,6 +33,7 @@ void Display::init(uint32_t screen_width, uint32_t screen_height) {
     //Load resources for the GUI
     marker_image = loadTexture("data/img/marker_sheet.bmp");
     empty_square = loadTexture("data/img/square.jpg");
+
 }
 
 Display::~Display() {
@@ -69,7 +70,7 @@ SDL_Texture * Display::loadTexture(const std::string & file) {
 
 void Display::renderTexture(SDL_Texture * texture, SDL_Rect dest,
 			    SDL_Rect * clip) {
-    SDL_RenderCopy(renderer, texture, clip, &dest);
+       SDL_RenderCopy(renderer, texture, clip, &dest);
 }
 
 void Display::renderTexture(SDL_Texture * texture, int32_t x, int32_t y,
@@ -131,6 +132,9 @@ void Display::render_empty_squares() {
 }
 
 void Display::update_screen() {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
     render_empty_squares();
     draw_notes(marker_image);
     SDL_RenderPresent(renderer);
