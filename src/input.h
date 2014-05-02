@@ -30,6 +30,7 @@ class Input {
     /**
      * Initializes the input component, and configures it to
      *   interact with the song state engine.
+     * @param song_state The song state engine to interact with.
      */
     void init(Song & song_state);
 };
