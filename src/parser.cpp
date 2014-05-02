@@ -15,14 +15,14 @@ using std::string;
 using std::ifstream;
 using boost::starts_with;
 
-void parse_chart(std::string & song_title, Song & input_song) {
+void parse_chart(const std::string & song_title, Song & input_song) {
     //Unicode constants
-    static const int32_t USPACE  = 32;
-    static const int32_t UNULL   = 0;
-    static const int32_t UDASH   = 65293;
-    static const int32_t USQUARE = 9633;
+    static const int32_t USPACE      = 32;
+    static const int32_t UNULL       = 0;
+    static const int32_t UDASH       = 65293;
+    static const int32_t USQUARE     = 9633;
     static const int32_t USQUARE_ALT = 21475;
-    static const int32_t UBAR    = 124;
+    static const int32_t UBAR        = 124;
 
     //Models to hold note and timing information
     int32_t note_order[4][4] = {{0}};
@@ -142,7 +142,7 @@ void parse_chart(std::string & song_title, Song & input_song) {
 }
 
 void add_notes(Song & input_song,
-	       int32_t note_order[][4],
+	       const int32_t note_order[][4],
 	       int32_t * positions) {
     for(int32_t pos_idx = 0; pos_idx < 16; pos_idx++) {
 	for(int32_t note_row = 0; note_row < 4; note_row++) {
@@ -160,14 +160,14 @@ void add_notes(Song & input_song,
     }
 }
 
-int32_t unicode_to_order(uint32_t uni_char) {
+int32_t unicode_to_order(const uint32_t & uni_char) {
     //Unicode value for circled 1, the rest are sequential.
     int32_t base_circled_num = 9312;
 
     return uni_char - base_circled_num + 1;
 }
 
-int32_t add_header_var(std::string line) {
+int32_t add_header_var(const std::string & line) {
     uint32_t location = line.find('=') + 1;
     try {
 	return stoi(line.substr(location));

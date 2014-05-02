@@ -30,10 +30,10 @@ void Input::init(Song & song_state) {
 
 void process_midi(double cur_time, std::vector<unsigned char> * message,
 			 void * song_state) {
-    int32_t BUTTON_BYTE_1 = 146;
-    int32_t BUTTON_BYTE_2_BASE = 36;
-    int32_t QUIT_BYTE_1 = 178;
-    int32_t QUIT_BYTE_2 = 127;
+    static const int32_t BUTTON_BYTE_1 = 146;
+    static const int32_t BUTTON_BYTE_2_BASE = 36;
+    static const int32_t QUIT_BYTE_1 = 178;
+    static const int32_t QUIT_BYTE_2 = 127;
 
     uint32_t num_bytes = message->size();
     Song * song = (Song *) (song_state);

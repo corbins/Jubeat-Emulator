@@ -11,7 +11,7 @@
  * @param song_title The title of the song.
  * @param input_song The song object to parse into.
  */
-void parse_chart(std::string & song_title, Song & input_song);
+void parse_chart(const std::string & song_title, Song & input_song);
 
 /**
  * Adds notes into the songs buffer for timing.
@@ -19,20 +19,20 @@ void parse_chart(std::string & song_title, Song & input_song);
  * @param note_order The order the notes are triggered.
  * @param positions The timing for each note.
  */
-void add_notes(Song & input_song, int32_t note_order[][4], int32_t * positions);
+void add_notes(Song & input_song, const int32_t note_order[][4], int32_t * positions);
 
 /**
  * Converts UTF-8 unicode characters to their correct order values.
  * @param uni_char The character to convert.
  * @return The correct order representation. (The number inside the circle.)
  */
-int32_t unicode_to_order(uint32_t uni_char);
+int32_t unicode_to_order(const uint32_t & uni_char);
 
 /**
  * Converts header variables into the representative int.
  * @param line The line to parse.
  * @return The int value, or 0 for invalid lines.
  */
-int32_t add_header_var(std::string line);
+int32_t add_header_var(const std::string & line);
 
 #endif
