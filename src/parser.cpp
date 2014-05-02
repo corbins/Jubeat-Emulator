@@ -150,7 +150,7 @@ void add_notes(Song & input_song,
 		uint32_t time = positions[pos_idx];
 
 		if(note - 1 == pos_idx) {
-		    input_song.note_position.push_back(std::make_tuple(note_row,
+		    input_song.note_queue.push_back(std::make_tuple(note_row,
 								       note_col,
 								       time));
 		}
