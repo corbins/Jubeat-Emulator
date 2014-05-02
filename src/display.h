@@ -37,7 +37,7 @@ class Display {
      * @param screen_width The width of the window.
      * @param screen_height The height of the screen.
      */
-    void init(uint32_t screen_width, uint32_t screen_height);
+    void init(const uint32_t & screen_width, const uint32_t & screen_height);
 
     /**
      * Draws a 4x4 grid of empty squares.
@@ -101,7 +101,8 @@ class Display {
      * @param frame The current frame of the note.
      * @param image The spritesheet of the marker.
      */
-    void render_note(int32_t row, int32_t col, int32_t frame, SDL_Texture * image);
+    void render_note(const int32_t & row, const int32_t & col,
+		     const int32_t & frame, SDL_Texture * image);
 };
 
 #endif

@@ -31,7 +31,7 @@ class Audio {
      * Begins playing the song file when the notes begin.
      * @param song_title The name of the song to begin playing.
      */
-    void play_song(std::string song_title);
+    void play_song(const std::string & song_title);
 };
 
 #endif

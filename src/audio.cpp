@@ -15,7 +15,7 @@ Audio::~Audio() {
     system->release();
 }
 
-void Audio::play_song(std::string song_title) {
+void Audio::play_song(std::string const & song_title) {
     std::string song_file = std::string("data/") + song_title + std::string("/") +
 	song_title + std::string(".mp3");
 

@@ -9,7 +9,7 @@
 
 Display::Display() {}
 
-void Display::init(uint32_t screen_width, uint32_t screen_height) {
+void Display::init(uint32_t const & screen_width, uint32_t const & screen_height) {
     //Begin loading GUI resources.
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
 	logSDLError(std::cout, "SDL_Init");
@@ -105,8 +105,8 @@ void Display::draw_notes(SDL_Texture * image) {
     }
 }
 
-void Display::render_note(int32_t row, int32_t col, int32_t frame,
-			  SDL_Texture * image) {
+void Display::render_note(const int32_t & row, const int32_t & col,
+			  const int32_t & frame, SDL_Texture * image) {
     SDL_Rect clip;
     clip.x = (frame - 1) % 5 * 100;
     clip.y = (frame - 1) / 5 * 100;
