@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+/**
+ * Handles the scoring, and note accuracy information.
+ */
 class Note {
  public:
     uint32_t perfect;
@@ -12,6 +15,9 @@ class Note {
     uint32_t miss;
     uint32_t combo;
 
+    /**
+     * Default constructor.  Initializes the scoring information to 0.
+     */
     Note();
 };
 

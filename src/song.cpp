@@ -1,8 +1,8 @@
 #include <tuple>
 #include <vector>
-#include <stdint.h>
 #include <chrono>
 #include <string>
+#include <stdint.h>
 
 #include "song.h"
 #include "note.h"
@@ -17,12 +17,13 @@ Song::Song() {
 }
 
 void Song::process_notes(uint32_t frames[][4]) {
+    //Make sure something was parsed.
     if(note_queue.size() == 0) {
 	return;
     }
 
+    //Find the duration in the song.
     auto temp = std::chrono::high_resolution_clock::now();
-
     auto cur_dur = std::chrono::duration_cast<std::chrono::milliseconds>
 	(temp - start_time);
 

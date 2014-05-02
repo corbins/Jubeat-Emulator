@@ -1,28 +1,45 @@
+#include <vector>
+#include <stdint.h>
+
+#include "song.h"
+#include "../lib/rtmidi/RtMidi.h"
+
 #ifndef INPUT_H
 #define INPUT_H
 
-#include "../lib/rtmidi/RtMidi.h"
-#include "song.h"
-#include <stdint.h>
-#include <vector>
-
+/**
+ * Handles the libraries and configuration for user input.
+ * Currently only supports the Akai MPD18 with RtMidi library.
+ */
 class Input {
  public:
+    //RtMidi library components.
     RtMidiIn * midi_in;
     uint32_t num_ports;
 
+    /**
+     * Default constructor.
+     */
     Input();
+
+    /**
+     * Default destructor.
+     */
     ~Input();
 
+    /**
+     * Initializes the input component, and configures it to
+     *   interact with the song state engine.
+     */
     void init(Song & song_state);
 };
 
 #endif
 
-/*
+/**
  * The callback function for the MIDI notes, will perform the behavior
- * assigned to each note.
- * @param cur_time The current time in milliseconds of the program
+ *   assigned to each note.
+ * @param cur_time The current time in milliseconds of the program.
  * @param message The midi byte information received
  * @param song_state The current state of the song.
  */

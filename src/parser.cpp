@@ -1,12 +1,12 @@
+#include <fstream>
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <fstream>
 #include <boost/algorithm/string/predicate.hpp>
 
 #include "parser.h"
-#include "../lib/utf8.h"
 #include "song.h"
+#include "../lib/utf8.h"
 
 //Set up namespacing to make code more readable
 using std::cout;
@@ -15,7 +15,7 @@ using std::string;
 using std::ifstream;
 using boost::starts_with;
 
-void parse_chart(std::string & input_file, Song & input_song) {
+void parse_chart(std::string & song_title, Song & input_song) {
     //Unicode constants
     static const int32_t USPACE  = 32;
     static const int32_t UNULL   = 0;
@@ -32,8 +32,8 @@ void parse_chart(std::string & input_file, Song & input_song) {
     int32_t note_row = 0;
 
     //Data to parse
-    string song_file = string("data/") + input_file + string("/") +
-	input_file + string(".txt");
+    string song_file = string("data/") + song_title + string("/") +
+	song_title + string(".txt");
     ifstream step_chart(song_file);
     string line;
 
@@ -50,7 +50,8 @@ void parse_chart(std::string & input_file, Song & input_song) {
 	uint32_t cur_char = 0;
 	bool note_timing = false;
 
-	//Begin by checking the metadata
+	//Begin by checking the metadata for tempo, song offset, beats,
+	//  and value.
 	if(starts_with(line, "t =")) {
 	    input_song.bpm = add_header_var(line);
 	    if(input_song.bpm != 0 && input_song.beats != 0) {

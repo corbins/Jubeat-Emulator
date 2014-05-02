@@ -10,7 +10,7 @@
 Display::Display() {}
 
 void Display::init(uint32_t screen_width, uint32_t screen_height) {
-    //Begin loading GUI resources
+    //Begin loading GUI resources.
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
 	logSDLError(std::cout, "SDL_Init");
     }
@@ -30,13 +30,14 @@ void Display::init(uint32_t screen_width, uint32_t screen_height) {
 	logSDLError(std::cout, "CreateRenderer");
     }
 
-    //Load resources for the GUI
+    //Load resources for the GUI.
     marker_image = loadTexture("data/img/marker_sheet.bmp");
     empty_square = loadTexture("data/img/square.jpg");
 
 }
 
 Display::~Display() {
+    //If it exists, make sure there is no leak.
     if(empty_square != NULL) {
 	SDL_DestroyTexture(empty_square);
     }
@@ -132,9 +133,11 @@ void Display::render_empty_squares() {
 }
 
 void Display::update_screen() {
+    //Set the background and clear the old state.
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
+    //Update the screen to the current state.
     render_empty_squares();
     draw_notes(marker_image);
     SDL_RenderPresent(renderer);
