@@ -1,9 +1,9 @@
 COMPILER = g++
-COMPILER_FLAGS = -c -g -Wall -Werror -std=c++11 -D__LINUX_ALSA__
+COMPILER_FLAGS = -c -g -Wall -Werror -std=c++11
 LINKER = g++
 
 jubeat: display.o audio.o input.o song.o note.o parser.o game.o jubeat.o
-	$(LINKER) jubeat.o game.o parser.o note.o song.o input.o audio.o display.o -o jubeat -lSDL2 -lSDL2_image -lSDL2_mixer ./lib/rtmidi/tests/Release/RtMidi.o -lasound -lpthread
+	$(LINKER) jubeat.o game.o parser.o note.o song.o input.o audio.o display.o -o jubeat -lSDL2 -lSDL2_image -lSDL2_mixer -lasound -lpthread ./lib/rtmidi/tests/Release/RtMidi.o
 
 jubeat.o: jubeat.cpp
 	$(COMPILER) $(COMPILER_FLAGS) jubeat.cpp

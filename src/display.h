@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014 Corbin Souffrant
+Copyright (c) 2014 Corbin Souffrant, Will Usher
 
 The MIT License (MIT)
 
