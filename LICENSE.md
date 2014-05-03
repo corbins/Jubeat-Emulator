@@ -13,6 +13,9 @@ Jubeat Emulator is licensed under the MIT license:
 Please cite and refer to the following other licenses if you use their source:
 
 -[RtMidi](http://www.music.mcgill.ca/~gary/rtmidi/index.html#license)
+
 -[SDL2](https://www.libsdl.org/license.php)
+
 -[TwinkleBearDev SDL2 Tutorial](https://github.com/Twinklebear/TwinklebearDev-Lessons/blob/master/LICENSE.md)
+
 -[UTF8-CPP](http://utfcpp.sourceforge.net/)
