@@ -1,11 +1,10 @@
 #include <vector>
-#include <stdint.h>
 
-#include "song.h"
+#include "./song.h"
 #include "../lib/rtmidi/RtMidi.h"
 
-#ifndef INPUT_H
-#define INPUT_H
+#ifndef SRC_INPUT_H_
+#define SRC_INPUT_H_
 
 /**
  * Handles the libraries and configuration for user input.
@@ -13,7 +12,7 @@
  */
 class Input {
  public:
-    //RtMidi library components.
+    // RtMidi library components.
     RtMidiIn * midi_in;
     uint32_t num_ports;
 
@@ -32,10 +31,10 @@ class Input {
      *   interact with the song state engine.
      * @param song_state The song state engine to interact with.
      */
-    void init(Song & song_state);
+    void init(Song * song_state);
 };
 
-#endif
+#endif  // SRC_INPUT_H_
 
 /**
  * The callback function for the MIDI notes, will perform the behavior
@@ -45,4 +44,4 @@ class Input {
  * @param song_state The current state of the song.
  */
 void process_midi(double cur_time, std::vector<unsigned char> * message,
-		  void * song_state);
+                  void * song_state);

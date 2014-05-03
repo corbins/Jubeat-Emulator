@@ -1,90 +1,87 @@
-#include <fstream>
-#include <iostream>
-#include <stdint.h>
-#include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <string>
 
-#include "display.h"
+#include "./display.h"
 
 Display::Display() {}
 
-void Display::init(uint32_t const & screen_width, uint32_t const & screen_height) {
-    //Begin loading GUI resources.
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
-	logSDLError(std::cout, "SDL_Init");
+void Display::init(uint32_t const & screen_width,
+                   uint32_t const & screen_height) {
+    // Begin loading GUI resources.
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        logSDLError("SDL_Init");
     }
 
-    //Set up the window to screen width and height.
+    // Set up the window to screen width and height.
     window = SDL_CreateWindow("Jubeat", 100, 100, screen_width,
-					   screen_height, SDL_WINDOW_SHOWN);
-    if (window == NULL){
-	logSDLError(std::cout, "CreateWindow");
+                                           screen_height, SDL_WINDOW_SHOWN);
+    if (window == NULL) {
+        logSDLError("CreateWindow");
     }
 
-    //Set up the renderer to draw to the window.
+    // Set up the renderer to draw to the window.
     renderer = SDL_CreateRenderer(window, -1,
-						 SDL_RENDERER_ACCELERATED |
-						 SDL_RENDERER_PRESENTVSYNC);
-    if (renderer == NULL){
-	logSDLError(std::cout, "CreateRenderer");
+                                                 SDL_RENDERER_ACCELERATED |
+                                                 SDL_RENDERER_PRESENTVSYNC);
+    if (renderer == NULL) {
+        logSDLError("CreateRenderer");
     }
 
-    //Load resources for the GUI.
+    // Load resources for the GUI.
     marker_image = loadTexture("data/img/marker_sheet.bmp");
     empty_square = loadTexture("data/img/square.jpg");
-
 }
 
 Display::~Display() {
-    //If it exists, make sure there is no leak.
-    if(empty_square != NULL) {
-	SDL_DestroyTexture(empty_square);
+    // If it exists, make sure there is no leak.
+    if (empty_square != NULL) {
+        SDL_DestroyTexture(empty_square);
     }
 
-    if(marker_image != NULL) {
-	SDL_DestroyTexture(marker_image);
+    if (marker_image != NULL) {
+        SDL_DestroyTexture(marker_image);
     }
 
-    if(renderer != NULL) {
-	SDL_DestroyRenderer(renderer);
+    if (renderer != NULL) {
+        SDL_DestroyRenderer(renderer);
     }
 
-    if(window != NULL) {
-	SDL_DestroyWindow(window);
+    if (window != NULL) {
+        SDL_DestroyWindow(window);
     }
 
     SDL_Quit();
 }
 
-void Display::logSDLError(std::ostream & os, const std::string & message) {
-    os << message << " error: " << SDL_GetError() << std::endl;
+void Display::logSDLError(const std::string & message) {
+    printf("%s error: %s\n", message.c_str(), SDL_GetError());
 }
 
 SDL_Texture * Display::loadTexture(const std::string & file) {
     SDL_Texture * texture = IMG_LoadTexture(renderer, file.c_str());
     if (texture == NULL) {
-	logSDLError(std::cout, "LoadTexture");
+        logSDLError("LoadTexture");
     }
     return texture;
 }
 
 void Display::renderTexture(SDL_Texture * texture, SDL_Rect dest,
-			    SDL_Rect * clip) {
+                            SDL_Rect * clip) {
        SDL_RenderCopy(renderer, texture, clip, &dest);
 }
 
 void Display::renderTexture(SDL_Texture * texture, int32_t x, int32_t y,
-			    SDL_Rect * clip) {
+                            SDL_Rect * clip) {
     SDL_Rect dest;
     dest.x = x;
     dest.y = y;
-    if (clip != NULL){
-	dest.w = clip->w;
-	dest.h = clip->h;
+    if (clip != NULL) {
+        dest.w = clip->w;
+        dest.h = clip->h;
+    } else {
+        SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
     }
-    else
-	SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
 
     renderTexture(texture, dest, clip);
 }
@@ -92,21 +89,21 @@ void Display::renderTexture(SDL_Texture * texture, int32_t x, int32_t y,
 void Display::draw_notes(SDL_Texture * image) {
     int32_t cur_row = 0;
     int32_t cur_col = 0;
-    for(cur_row = 0; cur_row < 4; cur_row++) {
-	for(cur_col = 0; cur_col < 4; cur_col++) {
-	    int32_t cur_note = note_frames[cur_row][cur_col];
+    for (cur_row = 0; cur_row < 4; cur_row++) {
+        for (cur_col = 0; cur_col < 4; cur_col++) {
+            int32_t cur_note = note_frames[cur_row][cur_col];
 
-	    if(cur_note != 0) {
-		render_note(cur_row, cur_col, cur_note, image);
-		note_frames[cur_row][cur_col] =
-		    (note_frames[cur_row][cur_col] + 1) % 25;
-	    }
-	}
+            if (cur_note != 0) {
+                render_note(cur_row, cur_col, cur_note, image);
+                note_frames[cur_row][cur_col] =
+                    (note_frames[cur_row][cur_col] + 1) % 25;
+            }
+        }
     }
 }
 
 void Display::render_note(const int32_t & row, const int32_t & col,
-			  const int32_t & frame, SDL_Texture * image) {
+                          const int32_t & frame, SDL_Texture * image) {
     SDL_Rect clip;
     clip.x = (frame - 1) % 5 * 100;
     clip.y = (frame - 1) / 5 * 100;
@@ -122,22 +119,22 @@ void Display::render_note(const int32_t & row, const int32_t & col,
 void Display::render_empty_squares() {
     int32_t cur_row = 0;
     int32_t cur_col = 0;
-    for(cur_row = 0; cur_row < 4; cur_row++) {
-	for(cur_col = 0; cur_col < 4; cur_col++) {
-	    int32_t x = cur_row * 115;
-	    int32_t y = cur_col * 115;
+    for (cur_row = 0; cur_row < 4; cur_row++) {
+        for (cur_col = 0; cur_col < 4; cur_col++) {
+            int32_t x = cur_row * 115;
+            int32_t y = cur_col * 115;
 
-	    renderTexture(empty_square, x, y, NULL);
-	}
+            renderTexture(empty_square, x, y, NULL);
+        }
     }
 }
 
 void Display::update_screen() {
-    //Set the background and clear the old state.
+    // Set the background and clear the old state.
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    //Update the screen to the current state.
+    // Update the screen to the current state.
     render_empty_squares();
     draw_notes(marker_image);
     SDL_RenderPresent(renderer);

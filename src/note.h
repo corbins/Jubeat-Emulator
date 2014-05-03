@@ -1,7 +1,7 @@
-#ifndef NOTE_H
-#define NOTE_H
-
 #include <stdint.h>
+
+#ifndef SRC_NOTE_H_
+#define SRC_NOTE_H_
 
 /**
  * Handles the scoring, and note accuracy information.
@@ -21,4 +21,4 @@ class Note {
     Note();
 };
 
-#endif
+#endif  // SRC_NOTE_H_

@@ -1,9 +1,9 @@
-#include <stdint.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <string>
 
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef SRC_DISPLAY_H_
+#define SRC_DISPLAY_H_
 
 /**
  * Handles the libraries and configuration necessary for display rendering.
@@ -11,15 +11,15 @@
  */
 class Display {
  public:
-    //SDL2 window and rendering components.
+    // SDL2 window and rendering components.
     SDL_Window * window;
     SDL_Renderer * renderer;
 
-    //Resources for drawing.
+    // Resources for drawing.
     SDL_Texture * marker_image;
     SDL_Texture * empty_square;
 
-    //Contains the state of the screen during the song.
+    // Contains the state of the screen during the song.
     uint32_t note_frames[4][4] = {{0}};
 
     /**
@@ -51,10 +51,9 @@ class Display {
 
     /**
      * Log an SDL error with some error message to the output stream.
-     * @param os The output stream to write the message to.
      * @param message The error msg to write, format:  msg error: SDL_GetError()
      */
-    void logSDLError(std::ostream & os, const std::string & message);
+    void logSDLError(const std::string & message);
 
     /**
      * Loads a BMP image into a texture on the rendering device.
@@ -69,10 +68,10 @@ class Display {
      * @param texture The source texture we want to draw.
      * @param dest The destination rectangle to render the texture to.
      * @param clip The sub-section of the texture to draw (clipping rect)
-     *		default of NULL draws the entire texture.
+     *          default of NULL draws the entire texture.
      */
     void renderTexture(SDL_Texture * texture, SDL_Rect dest,
-		       SDL_Rect * clip);
+                       SDL_Rect * clip);
 
     /**
      * Draw an SDL_Texture to an SDL_Renderer at position x, y, preserving
@@ -83,10 +82,10 @@ class Display {
      * @param x The x coordinate to draw to.
      * @param y The y coordinate to draw to.
      * @param clip The sub-section of the texture to draw (clipping rect)
-     *		default of NULL draws the entire texture.
+     *          default of NULL draws the entire texture.
      */
     void renderTexture(SDL_Texture * texture, int32_t x, int32_t y,
-		       SDL_Rect * clip);
+                       SDL_Rect * clip);
 
     /**
      * Draw any notes that are queued to be played.
@@ -102,10 +101,10 @@ class Display {
      * @param image The spritesheet of the marker.
      */
     void render_note(const int32_t & row, const int32_t & col,
-		     const int32_t & frame, SDL_Texture * image);
+                     const int32_t & frame, SDL_Texture * image);
 };
 
-#endif
+#endif  // SRC_DISPLAY_H_
 
 /*
 SDL code from TwinklebearDev-Lessons.

@@ -1,13 +1,13 @@
-#include <chrono>
 #include <stdint.h>
+#include <chrono>
 
-#include "audio.h"
-#include "input.h"
-#include "display.h"
-#include "song.h"
+#include "./audio.h"
+#include "./input.h"
+#include "./display.h"
+#include "./song.h"
 
-#ifndef GAME_H
-#define GAME_H
+#ifndef SRC_GAME_H_
+#define SRC_GAME_H_
 
 /**
  * The main Game engine.  Provides the basic functionality
@@ -15,7 +15,7 @@
  */
 class Game {
  public:
-    //True if the user wants to quit or the song finished.
+    // True if the user wants to quit or the song finished.
     bool end;
 
     /**
@@ -45,18 +45,18 @@ class Game {
     void score();
 
  private:
-    //Game configuration variables.
+    // Game configuration variables.
     const int32_t frames_per_second = 60;
     const uint32_t next_frame = 1000 / frames_per_second;
     uint32_t screen_width;
     uint32_t screen_height;
     bool render_frame;
 
-    //Component engine objects.
+    // Component engine objects.
     Audio audio_engine;
     Display display_engine;
     Song note_engine;
     Input input_engine;
 };
 
-#endif
+#endif  // SRC_GAME_H_

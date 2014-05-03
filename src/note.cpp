@@ -1,6 +1,4 @@
-#include <stdint.h>
-
-#include "note.h"
+#include "./note.h"
 
 Note::Note() {
     perfect = 0;
