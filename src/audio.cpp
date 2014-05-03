@@ -24,7 +24,7 @@ void Audio::play_song(std::string const & song_title) {
 
     song = Mix_LoadMUS(song_file.c_str());
     if(song == NULL) {
-	printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+	printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
     }
 
     Mix_PlayMusic(song, -1);

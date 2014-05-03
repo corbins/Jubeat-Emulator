@@ -14,15 +14,15 @@ void Display::init(uint32_t const & screen_width,
 
     // Set up the window to screen width and height.
     window = SDL_CreateWindow("Jubeat", 100, 100, screen_width,
-                                           screen_height, SDL_WINDOW_SHOWN);
+			      screen_height, SDL_WINDOW_SHOWN);
     if (window == NULL) {
         logSDLError("CreateWindow");
     }
 
     // Set up the renderer to draw to the window.
     renderer = SDL_CreateRenderer(window, -1,
-                                                 SDL_RENDERER_ACCELERATED |
-                                                 SDL_RENDERER_PRESENTVSYNC);
+				  SDL_RENDERER_ACCELERATED |
+				  SDL_RENDERER_PRESENTVSYNC);
     if (renderer == NULL) {
         logSDLError("CreateRenderer");
     }
