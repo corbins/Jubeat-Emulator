@@ -28,8 +28,11 @@ void Song::process_notes(uint32_t frames[][4]) {
     auto cur_dur = std::chrono::duration_cast<milliseconds>
         (temp - start_time);
 
-    // Grab notes 40 frames in advance (At 60 fps).
-    uint32_t frame_offset = 40 * (1000/60);
+    // Grab notes 60 frames in advance (At 60 fps).
+    //   This is to account for notes in advance as well as
+    //   delay from audio engine.
+    //   TODO(loliponi): Is this a constant delay?
+    uint32_t frame_offset = 60 * (1000/60);
 
     while (note_index != note_queue.end() &&
           std::chrono::duration_cast<milliseconds>

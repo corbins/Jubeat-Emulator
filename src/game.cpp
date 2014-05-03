@@ -1,3 +1,4 @@
+#include <SDL2/SDL.h>
 #include <chrono>
 #include <thread>
 
@@ -18,7 +19,16 @@ Game::Game() {
     init_engine();
 }
 
+Game::~Game() {
+    SDL_Quit();
+}
+
 void Game::init_engine() {
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        printf("Error with SDL_Init\n");
+    }
+
+    audio_engine.init();
     display_engine.init(screen_width, screen_height);
     input_engine.init(&note_engine);
 }
@@ -37,8 +47,8 @@ void Game::select_song() {
     // Begin playing the song.
     printf("Beginning song\n");
     note_engine.note_index = note_engine.note_queue.begin();
-    note_engine.start_time = std::chrono::high_resolution_clock::now();
     audio_engine.play_song(note_engine.song_title);
+    note_engine.start_time = std::chrono::high_resolution_clock::now();
 }
 
 void Game::frame_update() {

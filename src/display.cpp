@@ -1,4 +1,3 @@
-#include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <string>
 
@@ -50,8 +49,6 @@ Display::~Display() {
     if (window != NULL) {
         SDL_DestroyWindow(window);
     }
-
-    SDL_Quit();
 }
 
 void Display::logSDLError(const std::string & message) {

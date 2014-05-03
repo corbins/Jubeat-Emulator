@@ -25,6 +25,11 @@ class Game {
     Game();
 
     /**
+     * Default destructor.  Cleans up misc components.
+     */
+    ~Game();
+
+    /**
      * Configures the component engines to the correct states.
      */
     void init_engine();

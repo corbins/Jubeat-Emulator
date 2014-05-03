@@ -3,7 +3,7 @@ COMPILER_FLAGS = -c -g -Wall -Werror -std=c++11 -D__LINUX_ALSA__
 LINKER = g++
 
 jubeat: display.o audio.o input.o song.o note.o parser.o game.o jubeat.o
-	$(LINKER) jubeat.o game.o parser.o note.o song.o input.o audio.o display.o -o jubeat -lSDL2 -lSDL2_image ./lib/fmod/api/lib/libfmodex64.so /usr/lib/libSDL2_image.so ./lib/rtmidi/tests/Release/RtMidi.o -lasound -lpthread
+	$(LINKER) jubeat.o game.o parser.o note.o song.o input.o audio.o display.o -o jubeat -lSDL2 -lSDL2_image -lSDL2_mixer ./lib/rtmidi/tests/Release/RtMidi.o -lasound -lpthread
 
 jubeat.o: jubeat.cpp
 	$(COMPILER) $(COMPILER_FLAGS) jubeat.cpp

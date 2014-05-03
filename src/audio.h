@@ -1,31 +1,32 @@
+#include <SDL2/SDL_mixer.h>
 #include <string>
-
-#include "../lib/fmod/api/inc/fmod.hpp"
-#include "../lib/fmod/api/inc/fmod_errors.h"
 
 #ifndef SRC_AUDIO_H_
 #define SRC_AUDIO_H_
 
 /**
  * Handles the libraries and configuration necessary for audio playback.
- * Currently using FMOD library, and triggers the song to play.
+ * Currently using SDL mixer library, and triggers the song to play.
  */
 class Audio {
  public:
-    // FMOD library components
-    FMOD::System * system;
-    FMOD::Sound * sound;
-    FMOD::Channel * channel = 0;
+    //SDL music resource
+    Mix_Music * song = NULL;
 
     /**
-     * Default constructor.  Initializes the FMOD library.
+     * Default constructor.  Initializes the SDL mixer library.
      */
     Audio();
 
     /**
-     * Default destructor.  Releases the FMOD system.
+     * Default destructor.  Releases the SDL mixer system.
      */
     ~Audio();
+
+    /**
+     * Initializes the SDL mixer engine.
+     */
+    void init();
 
     /**
      * Begins playing the song file when the notes begin.
